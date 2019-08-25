@@ -1,13 +1,9 @@
-import 'dart:developer' as developer;
-import 'package:andy_board/widgets/audio_tile.dart';
-import 'package:random_color/random_color.dart';
-
-import 'surprise.dart';
-
-import 'package:andy_board/models/AndySound.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+
+import 'models/AndySound.dart';
+import 'widgets/audio_tile.dart';
 
 void main() => runApp(MyApp());
 

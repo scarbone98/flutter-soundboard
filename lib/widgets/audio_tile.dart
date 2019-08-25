@@ -1,15 +1,15 @@
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:andy_board/models/AndySound.dart';
 import 'package:random_color/random_color.dart';
+
+import '../models/AndySound.dart';
 
 class AudioTile extends StatefulWidget {
   final AndySound andySound;
   final AudioCache audioCache;
   final AudioPlayer currentPlayer;
   final Function setCurrentPlayer;
-
   const AudioTile(
       {Key key,
       @required this.andySound,
