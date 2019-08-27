@@ -26,6 +26,8 @@ class _AudioTileState extends State<AudioTile>
   Duration currentPos;
   Duration totalDuration;
   Color tileColor;
+  AudioPlayer currentTilePlayer;
+
   @override
   void initState() {
     super.initState();
@@ -52,7 +54,38 @@ class _AudioTileState extends State<AudioTile>
   }
 
   @override
+  void dispose() async {
+    super.dispose();
+    // currentTilePlayer?.release();
+    currentTilePlayer?.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var stack = Stack(children: [
+      Align(
+        alignment: Alignment.center,
+        child: Text(
+          widget.andySound.labelName,
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+      Visibility(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: LinearProgressIndicator(
+              value: currentPos != null && totalDuration != null
+                  ? currentPos.inMicroseconds / totalDuration.inMicroseconds
+                  : 0,
+              backgroundColor: Colors.black,
+            ),
+          ),
+        ),
+        visible: currentPos != null && totalDuration != null,
+      )
+    ]);
     return Container(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(2, 1, 2, 1),
@@ -62,22 +95,25 @@ class _AudioTileState extends State<AudioTile>
             if (widget.currentPlayer != null) {
               widget.currentPlayer.stop();
             }
-            AudioPlayer player =
+            currentTilePlayer =
                 await widget.audioCache.play(widget.andySound.soundName);
 
-            player.onDurationChanged.listen((Duration p) {
+            currentTilePlayer.onDurationChanged.listen((Duration p) {
               setState(() {
                 totalDuration = p;
               });
             });
 
-            player.onAudioPositionChanged.listen((Duration p) {
+            currentTilePlayer.onAudioPositionChanged.listen((Duration p) {
               setState(() {
                 currentPos = p;
               });
             });
 
-            player.onPlayerStateChanged.listen((AudioPlayerState s) {
+            currentTilePlayer.onPlayerError.listen((String error) {
+              print(error);
+            });
+            currentTilePlayer.onPlayerStateChanged.listen((AudioPlayerState s) {
               if (s == AudioPlayerState.COMPLETED ||
                   s == AudioPlayerState.STOPPED) {
                 setState(() {
@@ -86,34 +122,10 @@ class _AudioTileState extends State<AudioTile>
                 });
               }
             });
-            widget.setCurrentPlayer(player);
+            widget.setCurrentPlayer(currentTilePlayer);
           },
           child: Container(
-            child: Stack(children: [
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  widget.andySound.labelName,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Visibility(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: LinearProgressIndicator(
-                      value: currentPos != null && totalDuration != null
-                          ? currentPos.inMicroseconds /
-                              totalDuration.inMicroseconds
-                          : 0,
-                      backgroundColor: Colors.black,
-                    ),
-                  ),
-                ),
-                visible: currentPos != null && totalDuration != null,
-              )
-            ]),
+            child: stack,
           ),
         ),
       ),
