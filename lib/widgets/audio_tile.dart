@@ -33,7 +33,7 @@ class _AudioTileState extends State<AudioTile>
     super.initState();
     RandomColor randomColor = RandomColor();
     setState(() {
-      tileColor = randomColor.randomColor(colorHue: ColorHue.red);
+      tileColor = randomColor.randomColor(colorHue: ColorHue.random);
     });
   }
 
